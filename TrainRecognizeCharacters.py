@@ -4,18 +4,17 @@ from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 from skimage.io import imread
 from skimage.filters import threshold_otsu
-
+from . import bangla
 letters = [
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
             'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
-            'U', 'V', 'W', 'X', 'Y', 'Z'
-        ]
+            'U', 'V', 'W', 'X', 'Y', 'Z', 'অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ', 'ক', 'খ', 'গ', 'ঘ', 'ঙ','চ', 'ছ', 'জ', 'ঝ', 'ঞ','ট', 'ঠ', 'ড', 'ঢ', 'ণ', 'ত', 'থ', 'দ', 'ধ', 'ন','প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ', 'স', 'হ', 'ড়', 'ঢ়', 'য়', '-', '০', '১', '২', '৩', '৪','৫','৬', '৭', '৮', '৯','া', 'ি' 'ী', 'ু', 'ূ']
 
 def read_training_data(training_directory):
     image_data = []
     target_data = []
     for each_letter in letters:
-        for each in range(10):
+        for each in range(20):
             image_path = os.path.join(training_directory, each_letter, each_letter + '_' + str(each) + '.jpg')
             # read each image of each character
             img_details = imread(image_path, as_gray=True)

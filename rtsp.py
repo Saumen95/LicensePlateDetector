@@ -1,6 +1,4 @@
 import cv2
-import vlc
-import time
 
 cap = cv2.VideoCapture('rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov')
 

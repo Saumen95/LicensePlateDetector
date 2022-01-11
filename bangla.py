@@ -20,4 +20,3 @@ plt.imshow(adaptive_threshold, cmap='gray',vmin=0,vmax=255)
 data = pt.image_to_string(adaptive_threshold, lang='eng+ben', config='--psm 6')
 print(data)
 
-

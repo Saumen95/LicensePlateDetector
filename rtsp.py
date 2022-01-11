@@ -354,3 +354,96 @@ class OCR:
         self.graph = self.load_graph(self.model_file)
         self.sess = tf.Session(graph = self.graph)
 
+    def load_graph(self, modelFile):
+
+        graph = tf.Graph()
+        graph_def = tf.GraphDef()
+
+        with open(modelFile, "rb") as f:
+            graph_def.ParseFromString(f.read())
+
+        with graph.as_default():
+            tf.import_graph_def(graph_def)
+
+        return graph
+
+    def load_label(self, labelFile):
+        label = []
+        proto_as_ascii_lines = tf.gfile.GFile(labelFile).readlines()
+
+        for l in proto_as_ascii_lines:
+            label.append(l.rstrip())
+
+        return label
+
+    def convert_tensor(self, image, imageSizeOuput):
+        """
+        takes an image and transform it in tensor
+        """
+        image = cv2.resize(image,
+                           dsize =(imageSizeOuput,
+                                  imageSizeOuput),
+                           interpolation = cv2.INTER_CUBIC)
+
+        np_image_data = np.asarray(image)
+        np_image_data = cv2.normalize(np_image_data.astype('float'),
+                                      None, -0.5, .5,
+                                      cv2.NORM_MINMAX)
+
+        np_final = np.expand_dims(np_image_data, axis = 0)
+
+        return np_final
+
+    def label_image(self, tensor):
+
+        input_name = "import / input"
+        output_name = "import / final_result"
+
+        input_operation = self.graph.get_operation_by_name(input_name)
+        output_operation = self.graph.get_operation_by_name(output_name)
+
+        results = self.sess.run(output_operation.outputs[0],
+                                {input_operation.outputs[0]: tensor})
+        results = np.squeeze(results)
+        labels = self.label
+        top = results.argsort()[-1:][::-1]
+
+        return labels[top[0]]
+
+
+if __name__ == "__main__":
+
+    findPlate = PlateFinder()
+    model = OCR()
+
+    cap = cv2.VideoCapture('rtsp://admin:admin@2022@115.127.67.229:554/trackID=1')
+
+    while (cap.isOpened()):
+        ret, img = cap.read()
+
+        if ret == True:
+            cv2.imshow('original video', img)
+
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                break
+
+            possible_plates = findPlate.find_possible_plates(img)
+
+            if possible_plates is not None:
+
+                for i, p in enumerate(possible_plates):
+                    chars_on_plate = findPlate.char_on_plate[i]
+                    recognized_plate, _ = model.label_image_list(
+                               chars_on_plate, imageSizeOuput = 128)
+
+                    print(recognized_plate)
+                    cv2.imshow('plate', p)
+
+                    if cv2.waitKey(25) & 0xFF == ord('q'):
+                        break
+        else:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+

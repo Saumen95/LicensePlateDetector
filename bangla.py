@@ -20,15 +20,4 @@ plt.imshow(adaptive_threshold, cmap='gray',vmin=0,vmax=255)
 data = pt.image_to_string(adaptive_threshold, lang='eng+ben', config='--psm 6')
 print(data)
 
-def format(data):
-    regex = ("^(([A-Z]{2}[0-9]{2})" +
-             "( )|([A-Z]{2}-[0-9]" +
-             "{2}))((19|20)[0-9]" +
-             "[0-9])[0-9]{7}$")
-    p = re.compile(regex)
-    if p == None:
-        return False
-    if (re.search(p,data)):
-        return data
-    else:
-        return -1
+
